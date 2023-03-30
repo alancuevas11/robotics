@@ -1,7 +1,4 @@
 """Functions for modeling ROSBot"""
-#from math import cos, sin
-#import numpy as np
-import me416_utilities as mu
 
 def model_parameters():
     """Returns two constant model parameters"""
