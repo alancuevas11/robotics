@@ -54,7 +54,7 @@ class TwistPublisher(Node):
         Publishes Twist messages based on keyboard inputs.
         """
         key = self.getch()
-        if key == 'q' or key=='Q':
+        if key.lower() == 'q':
             self.get_logger().info('Shutdown initiated by user')
             self.destroy_node()
             self.is_running = False
