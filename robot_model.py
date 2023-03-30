@@ -32,7 +32,7 @@ class KeysToVelocities(object):
         Attributes:
         - speed_linear (float): the linear speed of the robot, initially set to 0.0
         - speed_angular (float): the angular speed of the robot, initially set to 0.0
-        - SPEED_DELTA (float): the increment of the speed when a key is pressed, set to 0.2
+        - speed_delta (float): the increment of the speed when a key is pressed, set to 0.2
         - text_description (string): a text description of the current state of the robot,
         initially set to "Ready"
         - getch (mu._Getch): an instance of the _Getch class from the me416_utilities module
@@ -40,7 +40,7 @@ class KeysToVelocities(object):
         # initialize attributes here
         self.speed_linear = 0.0
         self.speed_angular = 0.0
-        self.SPEED_DELTA = 0.2
+        self.speed_delta = 0.2
         self.text_description = "Ready"
 
     def update_speeds(self, key):
@@ -57,18 +57,18 @@ class KeysToVelocities(object):
         '''
         # Map keys to actions
         if not key.islower():
-            print("Input key must be lowercase")
+            self.text_description="Input key must be lowercase"
         if key == 'w':
-            self.speed_linear = float(min(self.speed_linear + self.SPEED_DELTA, 1.0))
+            self.speed_linear = float(min(self.speed_linear + self.speed_delta, 1.0))
             self.text_description = "Increased linear speed"
         elif key == 's':
-            self.speed_linear = float(max(self.speed_linear - self.SPEED_DELTA, -1.0))
+            self.speed_linear = float(max(self.speed_linear - self.speed_delta, -1.0))
             self.text_description = "Decreased linear speed"
         elif key == 'a':
-            self.speed_angular = float(min(self.speed_angular + self.SPEED_DELTA, 1.0))
+            self.speed_angular = float(min(self.speed_angular + self.speed_delta, 1.0))
             self.text_description = "Increased angular speed"
         elif key == 'd':
-            self.speed_angular = float(max(self.speed_angular - self.SPEED_DELTA, -1.0))
+            self.speed_angular = float(max(self.speed_angular - self.speed_delta, -1.0))
             self.text_description = "Decrease angular speed"
         elif key == 'z':
             self.speed_linear = 0.0
@@ -84,3 +84,4 @@ class KeysToVelocities(object):
             self.text_description = "Invalid Command"
 
         return self.speed_linear, self.speed_angular, self.text_description
+
