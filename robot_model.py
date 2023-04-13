@@ -24,7 +24,7 @@ def twist_to_speeds(speed_linear, speed_angular):
     # Solve for u matrix
     u = np.linalg.solve(A, z_dot)
     # Extract the left and right motor speeds
-    u_lw, u_rw = u[0], u[1]
+    u_lw, u_rw = u[0][0], u[1][0]
     # Return the left and right motor speeds
     return u_lw, u_rw
 
