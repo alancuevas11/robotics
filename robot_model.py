@@ -26,6 +26,10 @@ def twist_to_speeds(speed_linear, speed_angular):
     # Extract the left and right motor speeds
     u_lw= (1/k) * (speed_linear+ (d * speed_angular))
     u_rw = (1/k) * (((-1*d)*speed_angular) +speed_linear)
+    u_lw = max(u_lw, -1.0)
+    u_lw = min(u_lw, 1.0)
+    u_rw = max(u_rw, -1.0)
+    u_rw = min(u_rw, 1.0)
     # Return the left and right motor speeds
     return u_lw, u_rw
 
