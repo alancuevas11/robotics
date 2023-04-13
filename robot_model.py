@@ -18,13 +18,13 @@ def twist_to_speeds(speed_linear, speed_angular):
     # Calculate the A(theta) matrix
     A = system_matrix(theta)
     # Create z_dot
-    z_dot = np.array([[speed_linear*math.cos(theta), 0],
-                      [speed_linear*math.sin(theta),0],
+    z_dot = np.array([[speed_linear*math.cos(theta)],
+                      [speed_linear*math.sin(theta)],
                       [speed_angular]])
     # Solve for u matrix
     u = np.linalg.solve(A, z_dot)
     # Extract the left and right motor speeds
-    u_lw, u_rw = u[0][0], u[1][0]
+    u_lw, u_rw = u[0], u[1]
     # Return the left and right motor speeds
     return u_lw, u_rw
 
