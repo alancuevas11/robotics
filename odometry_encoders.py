@@ -22,7 +22,8 @@ class Odometry(Node):
     def __init__(self):
         super().__init__('odometry_encoders')
         self.publisher = self.create_publisher(MotorSpeedsStamped, 'odom_euler',10)
-        self.subscriber= self.create_subscription(PoseStamped, 'encoders', self.encoders_callback, 10)       
+        self.subscriber= self.create_subscription(PoseStamped, 'encoders',
+                                                  self.encoders_callback, 10)
         self.timer = self.create_timer(0.5, self.timer_callback)
         self.z_state= 0
         self.register = rm.StampedMsgRegister()
@@ -40,7 +41,7 @@ class Odometry(Node):
         msg.pose.orientation.z = quat[3]
         msg.pose.orientation.w = quat[0]
         # Fill position
-        # TODO: set msg.pose.position using the current state
+        #TODO: set msg.pose.position using the current state
         msg.header.stamp = self.get_clock().now().to_msg()
         msg.header.frame_id = 'map'
         self.publisher.publish(msg)
