@@ -4,12 +4,11 @@ Publishes odometry using Euler integration from motor speeds.
 """
 import numpy as np
 import rclpy
-import robot_model as rm
 from geometry_msgs.msg import PoseStamped
 from me416_msgs.msg import MotorSpeedsStamped
 from rclpy.node import Node
 from transforms3d.euler import euler2quat
-
+import robot_model as rm
 
 class Odometry(Node):
     '''
