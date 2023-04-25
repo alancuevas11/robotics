@@ -1,6 +1,6 @@
 #!/usr/bin/env/python3
 """
-Publishes odometry
+Publishes odometry using Euler integration from motor speeds.
 """
 
 from math import pi
@@ -21,12 +21,12 @@ class Odometry(Node):
     '''
     def __init__(self):
         super().__init__('odometry_encoders')
-        self.publisher = self.create_publisher(MotorSpeedsStamped, 'odom_euler',10)
-        self.subscriber= self.create_subscription(PoseStamped, 'encoders',
+        self.publisher = self.create_publisher(PoseStamped, 'odom_euler',10)
+        self.subscriber= self.create_subscription(MotorSpeedsStamped, 'encoders',
                                                   self.encoders_callback, 10)
         self.timer = self.create_timer(0.5, self.timer_callback)
-        self.z_state= 0
-        self.register = rm.StampedMsgRegister()
+        self.z_state= 0  # Initialize state estimate to zero vector
+        self.register = rm.StampedMsgRegister()  # Create object to keep track of time
 
     def timer_callback(self):
         '''
@@ -34,31 +34,35 @@ class Odometry(Node):
         '''
         msg = PoseStamped()
         # Fill orientation
-        theta = self.z_state
-        quat = euler2quat(0, 0, theta)
-        msg.pose.orientation.x = quat[1]
+        theta = self.z_state  # Extract orientation from state estimate
+        quat = euler2quat(0, 0, theta)  # Convert Euler angles to quaternion
+        msg.pose.orientation.x = quat[1]  # Fill quaternion components
         msg.pose.orientation.y = quat[2]
         msg.pose.orientation.z = quat[3]
-        msg.pose.orientation.w = quat[0]
-        # Fill position
-        #TODO: set msg.pose.position using the current state
-        msg.header.stamp = self.get_clock().now().to_msg()
-        msg.header.frame_id = 'map'
-        self.publisher.publish(msg)
-
+        msg.pose.orientation.w = quat[0] 
+        msg.pose.position.x = self.z_state[0]  # Fill position components
+        msg.pose.position.y = self.z_state[1]
+        msg.pose.position.z = 0  # Set z position to zero (2D planar case, no change in height)
+        msg.header.stamp = self.get_clock().now().to_msg()  # Get current time and set message header
+        msg.header.frame_id = 'map'  # Set frame ID
+        self.publisher.publish(msg)  # Publish message
+        
     def encoders_callback(self, msg):
         '''
         Integrate the motor speeds in pose estimate using Euler's method
         '''
-        # TODO: obtain elapsed time from previous call using the StampedMsgRegister attribute
-        # Note: the elapsed time cannot will not be available on the first call
-        # TODO: obtain input u for the model from msg
-        # TODO: apply Euler step to update current state estimate
-
+        stepsize = rm.StampedMsgRegister.replace_and_compute_delay(self,msg)  # Compute time step between messages
+        speed_linear = msg.twist.linear.x  # Extract linear speed from message
+        speed_angular = msg.twist.angular.z  # Extract angular speed from message
+        # Convert linear and angular speeds to motor speeds
+        u_lw, u_rw = rm.twist_to_speeds(speed_linear, speed_angular)
+        u_current = np.array([u_lw, u_rw])
+        z_next = rm.euler_step(self.z_state, u_current, stepsize)  # Integrate state estimate using Euler's method
+        self.z_state= z_next  # Update state estimate
 
 def main(args=None):
     '''
-    Init ROS, launch node, spin, cleanup
+    Initialize ROS, launch node, spin, cleanup
     '''
     rclpy.init(args=args)
     node = Odometry()
